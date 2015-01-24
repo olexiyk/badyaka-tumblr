@@ -97,6 +97,7 @@
         .permalink a {color: {color:Minor}; white-space: nowrap; padding: 0 0 4.5pt 9pt;}
         .permalink a:hover {color: {color:Text};}
         .permalink h2 {margin-bottom: 8pt;}
+        .permalink p {margin: 0;}
 
         .caption, .cite {font-size: 11pt; margin-top: 9pt;}
         .caption p {margin-top: 18pt;}
@@ -154,27 +155,27 @@
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
 <script type="text/javascript">
     function numberType(number) {
-        if(number == 0) {
+        if (number == 0) {
             return 0;
         }
-        if(number >= 11 && number <= 20) {
+        if (number >= 11 && number <= 20) {
             return 3;
         }
         number = Math.abs(number) % 10;
 
-        if(number == 1) {
+        if (number == 1) {
             return 1;
         }
-        if(number < 5 && number != 0) {
+        if (number < 5 && number != 0) {
             return 2;
         }
         return 3;
     }
 
     function getFormatedInt(number, arr) {
-        number_type = numberType(number);
+        var number_type = numberType(number);
         var str = '';
-        //console.log(number_type);
+
         switch (number_type) {
             case 1:
                 str = number + ' ' + arr[0];
@@ -189,42 +190,44 @@
         return str;
     }
 
-    $(document).ready(function(){
-        $('.post .permalink h2 a').each(function(){
-            //var bday = new Date.parse("04.02.2009");
-            var post_day = new Date.parse($(this).text());
-            //console.log(post_day);
-            function birthdates(post_day, bday) {
-                post_day.addYears("-" + bday.getYear());
-                post_day.addMonths(parseInt(("-" + bday.getMonth())));
-                post_day.addDays("-" + bday.toString('d'));
+    function birthdates(post_day_str, bday_str) {
+        var bday = new Date.parse(bday_str);
+        var post_day = new Date.parse(post_day_str);
+        if (bday > post_day) {
+            return "";
+        }
+        post_day.addYears("-" + bday.getYear());
+        post_day.addMonths(parseInt(("-" + bday.getMonth())));
+        post_day.addDays("-" + bday.toString('d'));
 
-                diff_days = post_day.toString('d');
-                diff_month = post_day.getMonth();
-                diff_years = post_day.getYear();
+        var diff_days = post_day.toString('d');
+        var diff_month = post_day.getMonth();
+        var diff_years = post_day.getYear();
 
-                if(diff_days == 31) {
-                    diff_days = 0;
-                    diff_month++;
-                }
+        if (diff_days == 31) {
+            diff_days = 0;
+            diff_month++;
+        }
 
-                if(diff_month == 12) {
-                    diff_month = 0;
-                    diff_years++;
-                }
+        if (diff_month == 12) {
+            diff_month = 0;
+            diff_years++;
+        }
 
-                var year_str = getFormatedInt(diff_years, ['рік','роки', 'років']);
-                var month_str = getFormatedInt(diff_month, ['місяць','місяці', 'місяців']);
-                var day_str = getFormatedInt(diff_days, ['день','дні', 'днів']);
+        var year_str = getFormatedInt(diff_years, ['рік', 'роки', 'років']);
+        var month_str = getFormatedInt(diff_month, ['місяць', 'місяці', 'місяців']);
+        var day_str = getFormatedInt(diff_days, ['день', 'дні', 'днів']);
 
-                post_str = '<span>' + year_str + ' ' + month_str + ' ' + day_str + '</span>';
-                return post_str;
-            }
-            var bohdan_bday = birthdates(post_day, new Date.parse("04.02.2009"));
-            var yarik_bday = birthdates(post_day, new Date.parse("04.03.2014"));
-            // $(this).parent().after(post_str);
-            $(this).parent().after(bohdan_bday);
-            $(this).parent().after(yarik_bday);
+        return year_str + ' ' + month_str + ' ' + day_str;
+    }
+
+    $(document).ready(function () {
+        $('.post .permalink h2 a').each(function () {
+            var bohdan_bday = birthdates($(this).text(), "04.02.2009");
+            var yarik_bday = birthdates($(this).text(), "04.03.2014");
+
+            $(this).parent().after('<p>' + yarik_bday + '</p>');
+            $(this).parent().after('<p>' + bohdan_bday + '</p>');
         });
     });
 
